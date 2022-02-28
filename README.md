@@ -75,4 +75,6 @@
          2. has the main function
          3. incorporates the reddit_scraper and the course_list_scraper to get the data
          4. Uses the OracleDatabase to update the data in the database
-      
+         
+## ERD
+![ERD](./ERD.png)
