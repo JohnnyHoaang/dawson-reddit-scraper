@@ -5,7 +5,7 @@ CREATE TABLE COURSES (
     course_number VARCHAR2(100) PRIMARY KEY, 
     course_name VARCHAR2(100),
     description VARCHAR2(1000),
-    total_hours NUMBER(2),
+    total_hours NUMBER(3),
     class_hours NUMBER(2),
     lab_hours NUMBER(2),
     homework_hours NUMBER(2)
