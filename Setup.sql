@@ -4,7 +4,11 @@ DROP TABLE COURSES_TERMS CASCADE CONSTRAINTS;
 CREATE TABLE COURSES (
     course_number VARCHAR2(100) PRIMARY KEY, 
     course_name VARCHAR2(100),
-    description VARCHAR2(1000)
+    description VARCHAR2(1000),
+    total_hours NUMBER(2),
+    class_hours NUMBER(2),
+    lab_hours NUMBER(2),
+    homework_hours NUMBER(2)
 );
 
 CREATE TABLE TERMS (
