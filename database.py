@@ -25,12 +25,6 @@ class OracleDB:
         with self.conn.cursor() as cur:
             cur.execute(insert_statement, values)
 
-    # Creates a table in the db and forcefully removes that table beforehand
-    def create_table(self, statement: str):
-        table_name = statement.split()[2]
-        self.__delete_table(table_name)
-        self.__execute(statement)
-
     # reads from the db using a query and returns a list of the rows returned
     def select(self, query: str) -> list[tuple]:
         data = []
@@ -40,17 +34,21 @@ class OracleDB:
         return data
 
     # Executes and arbitrary string of sql code
-    def __execute(self, query: str) -> None:
+    def execute_statement(self, query: str) -> None:
         with self.conn.cursor() as cur:
             cur.execute(query)
 
     # Deletes a table from the Database forcefully
-    def __delete_table(self, table_name: str):
-        del_query = f"drop table {table_name} cascade constraints"
+    def force_table_drop(self, table_name: str):
+        drop_query = f'drop table {table_name} cascade constraints'
         try:
-            self.__execute(del_query)
+            self.execute_statement(drop_query)
         except DatabaseError:
             pass
+
+    def drop_table(self, table_name: str):
+        del_query = f"drop table {table_name}"
+        self.execute_statement(del_query)
 
     # Closes the connection
     def close(self):
@@ -63,3 +61,27 @@ class OracleDB:
     # Closes the connection when exiting the with statement
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+
+
+class CSDatabase():
+
+    def cs_database_setup(self):
+        with OracleDB() as database:
+            self.__drop_tables(database)
+
+
+    def __drop_tables(self, database: OracleDB):
+        database.force_table_drop('courses_terms')
+        database.force_table_drop('courses')
+        database.force_table_drop('terms')
+
+    def __create_tables(self, database: OracleDB):
+        database.execute_statement('')
+
+    # def __read_statements(self) -> list[str]:
+
+
+if __name__ == '__main__':
+    from file_io import SQLFileReader
+    fr = SQLFileReader('Setup.sql')
+    print(fr.read_statements())
