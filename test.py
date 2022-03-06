@@ -18,13 +18,14 @@ if page.status_code == 200:
         # length of courses in one term
         length = int(len(table[i].findAll('tr', style=re.compile(r'display:none;'))) / 2)
         for j in range(0, length):
-            course = {'course_number': None, 'course_title': None, 'course_description': None, 
-                        'term_number': None, 'total_hours' : None, 'class_hours' : None, 'homework_hours':None, 'lab_hours' : None}
+            course = {'course_number': None, 'course_title': None, 'course_description': None,
+                      'term_number': None, 'total_hours': None, 'class_hours': None, 'homework_hours': None,
+                      'lab_hours': None}
             # searching by id tags
             term_number = int(headers[i].text[-1])
             courseN = table[i].find('td', {"id": f"coursenumber{numberCourses}"})
-            ponderation = table[i].find('td', { "id": f"ponderation{numberCourses}"})
-            total_hours = table[i].find('td', { "id": f"hours{numberCourses}"})
+            ponderation = table[i].find('td', {"id": f"ponderation{numberCourses}"})
+            total_hours = table[i].find('td', {"id": f"hours{numberCourses}"})
             title = table[i].find('td', {"id": f"title{numberCourses}"})
             description_row = table[i].find('tr', {"id": f"{numberCourses}"})
             try:
@@ -58,33 +59,34 @@ if page.status_code == 200:
         conn.autocommit = True
         with conn.cursor() as cur:
             # try:
-    #         #     cur.execute("DROP TABLE COURSES CASCADE CONSTRAINTS")
-    #         #     cur.execute("DROP TABLE TERMS CASCADE CONSTRAINTS")
-    #         #     cur.execute("DROP TABLE COURSES_TERMS CASCADE CONSTRAINTS")
-    #         # except DatabaseError as e:
-    #         #     pass
-    #         # cur.execute('''CREATE TABLE COURSES (
-    #         #         course_number VARCHAR2(100) PRIMARY KEY, 
-    #         #         course_name VARCHAR2(100),
-    #         #         description VARCHAR2(1000))'''
-    #         # )
-    #         # cur.execute('''CREATE TABLE TERMS (
-    #         #        term_number NUMBER(2) PRIMARY KEY)'''
-    #         # )
-    #         # cur.execute('''CREATE TABLE COURSES_TERMS (
-    #         #         term_number NUMBER(2),
-    #         #         course_number VARCHAR2(100) PRIMARY KEY,
-    #         #         CONSTRAINT term_fk
-    #         #         FOREIGN KEY (term_number)
-    #         #         REFERENCES terms (term_number),
-    #         #         CONSTRAINT course_fk
-    #         #         FOREIGN KEY (course_number)
-    #         #         REFERENCES courses (course_number))'''
-    #         # )
+            #         #     cur.execute("DROP TABLE COURSES CASCADE CONSTRAINTS")
+            #         #     cur.execute("DROP TABLE TERMS CASCADE CONSTRAINTS")
+            #         #     cur.execute("DROP TABLE COURSES_TERMS CASCADE CONSTRAINTS")
+            #         # except DatabaseError as e:
+            #         #     pass
+            #         # cur.execute('''CREATE TABLE COURSES (
+            #         #         course_number VARCHAR2(100) PRIMARY KEY,
+            #         #         course_name VARCHAR2(100),
+            #         #         description VARCHAR2(1000))'''
+            #         # )
+            #         # cur.execute('''CREATE TABLE TERMS (
+            #         #        term_number NUMBER(2) PRIMARY KEY)'''
+            #         # )
+            #         # cur.execute('''CREATE TABLE COURSES_TERMS (
+            #         #         term_number NUMBER(2),
+            #         #         course_number VARCHAR2(100) PRIMARY KEY,
+            #         #         CONSTRAINT term_fk
+            #         #         FOREIGN KEY (term_number)
+            #         #         REFERENCES terms (term_number),
+            #         #         CONSTRAINT course_fk
+            #         #         FOREIGN KEY (course_number)
+            #         #         REFERENCES courses (course_number))'''
+            #         # )
 
             for course in courses_list:
-                courses_info = [course['course_number'], course['course_title'], course['course_description'], 
-                                course['total_hours'], course['class_hours'], course['lab_hours'], course['homework_hours']]
+                courses_info = [course['course_number'], course['course_title'], course['course_description'],
+                                course['total_hours'], course['class_hours'], course['lab_hours'],
+                                course['homework_hours']]
                 courses_term_info = [course['term_number'], course['course_number']]
                 insert_courses = "INSERT INTO COURSES VALUES(:1,:2,:3,:4,:5,:6,:7)"
                 insert_courses_terms = "INSERT INTO COURSES_TERMS VALUES(:1,:2)"
