@@ -75,9 +75,4 @@ class CSDatabase:
     def setup_database(self):
         with OracleDB() as database:
             for statement in self.__file_reader.read_statements():
-                database.execute_statement(statement)
-
-
-if __name__ == '__main__':
-    csd = CSDatabase('Setup.sql')
-    csd.setup_database()
+                database.execute_statement(statement, True)

@@ -77,4 +77,4 @@
          4. Uses the OracleDatabase to update the data in the database
          
 ## ERD
-![ERD](./ERD.png)
+![ERD](assets/ERD.png)

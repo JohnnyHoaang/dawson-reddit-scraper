@@ -58,30 +58,6 @@ if page.status_code == 200:
         print('Connected')
         conn.autocommit = True
         with conn.cursor() as cur:
-            # try:
-            #         #     cur.execute("DROP TABLE COURSES CASCADE CONSTRAINTS")
-            #         #     cur.execute("DROP TABLE TERMS CASCADE CONSTRAINTS")
-            #         #     cur.execute("DROP TABLE COURSES_TERMS CASCADE CONSTRAINTS")
-            #         # except DatabaseError as e:
-            #         #     pass
-            #         # cur.execute('''CREATE TABLE COURSES (
-            #         #         course_number VARCHAR2(100) PRIMARY KEY,
-            #         #         course_name VARCHAR2(100),
-            #         #         description VARCHAR2(1000))'''
-            #         # )
-            #         # cur.execute('''CREATE TABLE TERMS (
-            #         #        term_number NUMBER(2) PRIMARY KEY)'''
-            #         # )
-            #         # cur.execute('''CREATE TABLE COURSES_TERMS (
-            #         #         term_number NUMBER(2),
-            #         #         course_number VARCHAR2(100) PRIMARY KEY,
-            #         #         CONSTRAINT term_fk
-            #         #         FOREIGN KEY (term_number)
-            #         #         REFERENCES terms (term_number),
-            #         #         CONSTRAINT course_fk
-            #         #         FOREIGN KEY (course_number)
-            #         #         REFERENCES courses (course_number))'''
-            #         # )
 
             for course in courses_list:
                 courses_info = [course['course_number'], course['course_title'], course['course_description'],
