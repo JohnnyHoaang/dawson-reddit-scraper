@@ -30,3 +30,4 @@ insert into terms VALUES(3);
 insert into terms VALUES(4);
 insert into terms VALUES(5);
 insert into terms VALUES(6);
+commit;

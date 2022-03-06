@@ -32,7 +32,7 @@ class OracleDB:
         self.__execute(statement)
 
     # reads from the db using a query and returns a list of the rows returned
-    def read_from_db(self, query: str) -> list[tuple]:
+    def select(self, query: str) -> list[tuple]:
         data = []
         with self.conn.cursor() as cur:
             for row in cur.execute(query):
