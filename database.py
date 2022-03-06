@@ -1,6 +1,7 @@
 import cx_Oracle
 from cx_Oracle import DatabaseError
 from db_config import Config
+from file_io import SQLFileReader
 
 cx_Oracle.init_oracle_client(lib_dir=Config.lib)
 
@@ -34,9 +35,13 @@ class OracleDB:
         return data
 
     # Executes and arbitrary string of sql code
-    def execute_statement(self, query: str) -> None:
-        with self.conn.cursor() as cur:
-            cur.execute(query)
+    def execute_statement(self, query: str, silent=False) -> None:
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(query)
+        except DatabaseError as e:
+            if not silent:
+                raise e
 
     # Deletes a table from the Database forcefully
     def force_table_drop(self, table_name: str):
@@ -63,25 +68,16 @@ class OracleDB:
         self.close()
 
 
-class CSDatabase():
+class CSDatabase:
+    def __init__(self, setup_file: str):
+        self.__file_reader = SQLFileReader(setup_file)
 
-    def cs_database_setup(self):
+    def setup_database(self):
         with OracleDB() as database:
-            self.__drop_tables(database)
-
-
-    def __drop_tables(self, database: OracleDB):
-        database.force_table_drop('courses_terms')
-        database.force_table_drop('courses')
-        database.force_table_drop('terms')
-
-    def __create_tables(self, database: OracleDB):
-        database.execute_statement('')
-
-    # def __read_statements(self) -> list[str]:
+            for statement in self.__file_reader.read_statements():
+                database.execute_statement(statement)
 
 
 if __name__ == '__main__':
-    from file_io import SQLFileReader
-    fr = SQLFileReader('Setup.sql')
-    print(fr.read_statements())
+    csd = CSDatabase('Setup.sql')
+    csd.setup_database()
