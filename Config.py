@@ -1,3 +1,0 @@
-user = ""
-pwd = ""
-lib = r''
