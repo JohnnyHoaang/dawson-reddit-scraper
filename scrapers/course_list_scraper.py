@@ -17,24 +17,24 @@ class CourseScrapper:
         return page.content
 
     def get_courses(self):
-        terms = self.__course_info.find_all('table', {'class': 'l r b t top-label-table course-grid enable-first'})
         all_courses = []
-        term_numbers = self.get_terms()
         total_courses = len(self.__course_info.find_all('tr', {'onmouseout': 'this.style.backgroundColor="#ffffff";'}))
-        for j in range(len(terms)):
-            for i in range(1, total_courses+1):
-                # All the concentration courses have a table with descriptions
-                description_row = self.__course_info.find('tr', {'id': f'{i}'})
-                if description_row.find('table') is not None:
-                    ponderation = self.__course_info.find('td', {'id': f'ponderation{i}'}).text.split(' - ')
-                    course = {'term_number': term_numbers[j],
-                              'course_number': self.__course_info.find('td', {'id': f'coursenumber{i}'}).text,
-                              'course_name': self.__course_info.find('td', {'id': f'title{i}'}).text,
-                              'description': description_row.find_all('td')[-1].text,
-                              'class_hours': int(ponderation[0]),
-                              'lab_hours': int(ponderation[1]),
-                              'homework_hours': int(ponderation[2]),
-                              'total_hours': int(self.__course_info.find('td', {'id': f'hours{i}'}).text)}
+        for i in range(1, total_courses + 1):
+            # All the concentration courses have a table with descriptions
+            description_row = self.__course_info.find('tr', {'id': f'{i}'})
+            if description_row.find('p') is None and description_row.find('a') is None:
+                ponderation = self.__course_info.find('td', {'id': f'ponderation{i}'}).text.split(' - ')
+                course = {
+                    'term_number': description_row
+                        .find_previous('h2', {'class': 'noPadding'}).text.strip().split(' ')[-1],
+                    'course_number': self.__course_info.find('td', {'id': f'coursenumber{i}'}).text,
+                    'course_name': self.__course_info.find('td', {'id': f'title{i}'}).text,
+                    'description': description_row.find_all('td')[-1].text,
+                    'class_hours': int(ponderation[0]),
+                    'lab_hours': int(ponderation[1]),
+                    'homework_hours': int(ponderation[2]),
+                    'total_hours': int(self.__course_info.find('td', {'id': f'hours{i}'}).text)}
+                if course['description'] != '':
                     all_courses.append(course)
 
         return all_courses

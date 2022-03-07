@@ -92,7 +92,6 @@ class CSDatabase:
                       course['lab_hours'],
                       course['homework_hours'],
                       course['total_hours'])
-            print(values)
             self.__database.populate_table('courses', values)
 
     # populates the course_terms tables with a list of dictionaries containing the
@@ -113,13 +112,13 @@ class CSDatabase:
 
 if __name__ == '__main__':
     from scrapers.course_list_scraper import CourseScrapper
-    database = CSDatabase()
-    print('Setting up the database...')
-    database.setup_database('Setup.sql')
-    print('Getting the course info...')
-    scrapper = CourseScrapper()
-    print('Populating the database...')
-    database.populate_terms(scrapper.get_terms())
-    database.populate_courses(scrapper.get_courses())
-    database.populate_course_terms(scrapper.get_courses())
-    print('done!')
+    with CSDatabase() as database:
+        print('Setting up the database...')
+        database.setup_database('Setup.sql')
+        print('Getting the course info...')
+        scrapper = CourseScrapper()
+        print('Populating the database...')
+        database.populate_terms(scrapper.get_terms())
+        database.populate_courses(scrapper.get_courses())
+        database.populate_course_terms(scrapper.get_courses())
+        print('done!')
