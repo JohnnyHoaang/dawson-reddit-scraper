@@ -69,10 +69,57 @@ class OracleDB:
 
 
 class CSDatabase:
-    def __init__(self, setup_file: str):
-        self.__file_reader = SQLFileReader(setup_file)
+    def __init__(self):
+        self.__database = OracleDB()
 
-    def setup_database(self):
-        with OracleDB() as database:
-            for statement in self.__file_reader.read_statements():
-                database.execute_statement(statement, True)
+    def setup_database(self, setup_file: str):
+        file_reader = SQLFileReader(setup_file)
+        for statement in file_reader.read_statements():
+            self.__database.execute_statement(statement, True)
+
+    def populate_terms(self, data: list[int]):
+        for term_number in data:
+
+            self.__database.populate_table('terms', (term_number,))
+
+    # Populates the courses tables with a list of dictionaries containing the course data
+    def populate_courses(self, data: list[dict]):
+        for course in data:
+            values = (course['course_number'],
+                      course['course_name'],
+                      course['description'],
+                      course['class_hours'],
+                      course['lab_hours'],
+                      course['homework_hours'],
+                      course['total_hours'])
+            print(values)
+            self.__database.populate_table('courses', values)
+
+    # populates the course_terms tables with a list of dictionaries containing the
+    def populate_course_terms(self, data: list[dict]):
+        for course in data:
+            values = (course['term_number'], course['course_number'])
+            self.__database.populate_table('courses_terms', values)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.__database.close()
+
+    def close(self):
+        self.__database.close()
+
+
+if __name__ == '__main__':
+    from scrapers.course_list_scraper import CourseScrapper
+    database = CSDatabase()
+    print('Setting up the database...')
+    database.setup_database('Setup.sql')
+    print('Getting the course info...')
+    scrapper = CourseScrapper()
+    print('Populating the database...')
+    database.populate_terms(scrapper.get_terms())
+    database.populate_courses(scrapper.get_courses())
+    database.populate_course_terms(scrapper.get_courses())
+    print('done!')
