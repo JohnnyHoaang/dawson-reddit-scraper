@@ -15,13 +15,28 @@ class RedditScraper:
     def search(self, keyword: list[str]):
         param = ""
         for key in keyword:
-            param += key + ','
+            param += key + '|'
         return self.__request({'q': param[0:-1]})
 
 
 if __name__ == '__main__':
     s = RedditScraper()
-    data = s.search(['admission'])
+    data = s.search(['computer science', 'cs'])
     for d in data:
-        print(f"Title: {d['title']}")
-        print(f"Body: {d['selftext']}")
+
+        if d['title'] == '':
+            print('(no title)')
+        else:
+            print(f"Title: {d['title']}")
+
+        if d['selftext'] == '':
+            print('(no body)')
+        else:
+            print(f"Body: {d['selftext']}")
+
+        if d['author'] == '':
+            print('(no author)')
+        else:
+            print(f"Author: {d['author']}")
+
+        print('______________________________________')
