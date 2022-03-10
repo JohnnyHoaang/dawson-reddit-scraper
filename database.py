@@ -111,7 +111,7 @@ class CSDatabase:
 
 
 if __name__ == '__main__':
-    from scrapers.course_list_scraper import CourseScrapper
+    from course_list_scraper import CourseScrapper
     with CSDatabase() as database:
         print('Setting up the database...')
         database.setup_database('Setup.sql')
