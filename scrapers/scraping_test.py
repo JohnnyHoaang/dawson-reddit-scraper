@@ -67,7 +67,6 @@ if __name__ == '__main__':
     s = RedditScraper()
     submissions = s.search_submission(['computer science'])
     comments = s.search_comments(['computer science'])
-
     a = Analyzer()
     print(f'Average post length: {a.get_average_length_data(submissions, "submission")}')
     print(f'Average comment length: {a.get_average_length_data(comments, "comment")}')
