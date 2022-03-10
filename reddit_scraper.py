@@ -29,7 +29,7 @@ class RedditScraper:
         param = ""
         for key in keyword:
             param += key + '|'
-        return self.__request(self.__url, {'q': param[0:-1], 'before': periods[0], 'after': periods[1]})
+        return self.__request(self.__url, {'q': param[0:-1], 'after': periods[0], 'before': periods[1]})
 
 
 class RedditAPIScraper:

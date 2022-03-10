@@ -61,9 +61,6 @@ class Analyzer:
         computer_words = {'computer', 'science', 'technology'}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
-    # returns number of posts
-    def get_frequency_of_posts(self, data):
-        return len(data)
 
 if __name__ == '__main__':
     s = RedditScraper()
@@ -76,14 +73,14 @@ if __name__ == '__main__':
     a.get_common_text_keywords(comments, "comment")
     a.get_common_text_keywords(submissions, "submission")
 
-    jan_mar = [1617152400, 1609462800]
-    apr_jun = [1625014800, 1617238800]
-    jul_sep = [1632963600,1625101200]
-    oct_dec = [1640912400, 1633050000]
-    q1 = a.get_frequency_of_posts(s.search_dates(['computer science'], jan_mar))
-    q2 = a.get_frequency_of_posts(s.search_dates(['computer science'], apr_jun))
-    q3= a.get_frequency_of_posts(s.search_dates(['computer science'], jul_sep))
-    q4 = a.get_frequency_of_posts(s.search_dates(['computer science'], oct_dec))
+    jan_mar = [1609462800, 1617152400]
+    apr_jun = [1617238800, 1625014800]
+    jul_sep = [1625101200, 1632963600]
+    oct_dec = [1633050000, 1640912400]
+    q1 = len(s.search_dates(['computer science'], jan_mar))
+    q2 = len(s.search_dates(['computer science'], apr_jun))
+    q3 = len(s.search_dates(['computer science'], jul_sep))
+    q4 = len(s.search_dates(['computer science'], oct_dec))
     print(f"January to March: {q1}")
     print(f"April to June: {q2}")
     print(f"July to September: {q3}")
