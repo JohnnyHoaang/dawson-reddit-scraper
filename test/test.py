@@ -1,4 +1,5 @@
 url = "https://www.dawsoncollege.qc.ca/computer-science-technology/course-list/"
+from posixpath import split
 from sqlite3 import DatabaseError
 import requests
 
@@ -44,11 +45,11 @@ if page.status_code == 200:
             except Exception as e:
                 pass
             numberCourses += 1
-    for i in courses_list:
-        print(i)
+    # for i in courses_list:
+    #     print(i)
 
     import cx_Oracle
-    import Config
+    from db_config import Config
 
     cx_Oracle.init_oracle_client(lib_dir=Config.lib)
     dsn = cx_Oracle.makedsn('198.168.52.211',
@@ -59,18 +60,33 @@ if page.status_code == 200:
         conn.autocommit = True
         with conn.cursor() as cur:
 
-            for course in courses_list:
-                courses_info = [course['course_number'], course['course_title'], course['course_description'],
-                                course['total_hours'], course['class_hours'], course['lab_hours'],
-                                course['homework_hours']]
-                courses_term_info = [course['term_number'], course['course_number']]
-                insert_courses = "INSERT INTO COURSES VALUES(:1,:2,:3,:4,:5,:6,:7)"
-                insert_courses_terms = "INSERT INTO COURSES_TERMS VALUES(:1,:2)"
-                try:
-                    cur.execute(insert_courses, courses_info)
-                    cur.execute(insert_courses_terms, courses_term_info)
-                except cx_Oracle.DatabaseError as e:
-                    print(e)
+            # for course in courses_list:
+            #     courses_info = [course['course_number'], course['course_title'], course['course_description'],
+            #                     course['total_hours'], course['class_hours'], course['lab_hours'],
+            #                     course['homework_hours']]
+            #     courses_term_info = [course['term_number'], course['course_number']]
+            #     insert_courses = "INSERT INTO COURSES VALUES(:1,:2,:3,:4,:5,:6,:7)"
+            #     insert_courses_terms = "INSERT INTO COURSES_TERMS VALUES(:1,:2)"
+            #     try:
+            #         cur.execute(insert_courses, courses_info)
+            #         cur.execute(insert_courses_terms, courses_term_info)
+            #     except cx_Oracle.DatabaseError as e:
+            #         print(e)
+            filtered_list = []
+            for i in courses_list:
+                title_split = i['course_title'].split(' ')
+                title = ' '
+                if title_split[-1][-1] == 'I' or title_split[-1][-1] == 'V':
+                    title_split.remove(title_split[-1])
+                    title = ' '.join(title_split)
+                title = ' '.join(title_split)
+                filtered_list.append(title)
+            title_set = list(set(filtered_list))
+            # print(title_set)
+
+
+       
+
 
 else:
     print("Connection not established")
