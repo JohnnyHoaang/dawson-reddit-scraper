@@ -1,2 +1,2 @@
-database/db_config.py
-test/db_config.py
+db_config.py
+__pycache__/

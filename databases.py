@@ -1,7 +1,8 @@
 import cx_Oracle
 from cx_Oracle import DatabaseError
 from db_config import Config
-from file_io import SQLFileReader
+from file_reader import SQLFileReader
+from course_list_scraper import CourseScrapper
 
 cx_Oracle.init_oracle_client(lib_dir=Config.lib)
 
@@ -68,7 +69,7 @@ class OracleDB:
         self.close()
 
 
-class CSDatabase:
+class CourseScrapingDatabase:
     def __init__(self):
         self.__database = OracleDB()
 
@@ -110,15 +111,10 @@ class CSDatabase:
         self.__database.close()
 
 
-if __name__ == '__main__':
-    from scrapers.course_list_scraper import CourseScrapper
-    with CSDatabase() as database:
-        print('Setting up the database...')
-        database.setup_database('Setup.sql')
-        print('Getting the course info...')
+def build_cs_database():
+    with CourseScrapingDatabase() as database:
+        database.setup_database('database_resources/Setup.sql')
         scrapper = CourseScrapper()
-        print('Populating the database...')
         database.populate_terms(scrapper.get_terms())
         database.populate_courses(scrapper.get_courses())
         database.populate_course_terms(scrapper.get_courses())
-        print('done!')
