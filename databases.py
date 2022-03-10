@@ -113,7 +113,7 @@ class CourseScrapingDatabase:
 
 def build_cs_database():
     with CourseScrapingDatabase() as database:
-        database.setup_database('Setup.sql')
+        database.setup_database('database_resources/Setup.sql')
         scrapper = CourseScrapper()
         database.populate_terms(scrapper.get_terms())
         database.populate_courses(scrapper.get_courses())
