@@ -17,7 +17,7 @@ class OracleDB:
         self.conn.autocommit = True
 
     # Populates a table with a list of values
-    def populate_table(self, table_name: str, values: list | tuple):
+    def populate_table(self, table_name: str, values: tuple):
         insert_statement = f'insert into {table_name} values ('
         for value in range(len(values)):
             insert_statement += f':{value + 1}'
