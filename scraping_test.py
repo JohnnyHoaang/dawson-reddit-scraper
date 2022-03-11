@@ -6,14 +6,24 @@ import nltk
 from databases import CourseScrapingDatabase
 
 class Analyzer:
-    def get_cs_keywords(self):
+
+    def get_cs_keywords(self) -> set:
         with CourseScrapingDatabase() as database:
             course_info = database.get_all_course_info()
-
+        # I love python
+        # keywords = [(info['course_name'], ' '.join(info['course_name'].split(' ')[0:-1]))[info['course_name'].split(' ')[-1][-1] == 'I' or info['course_name'].split(' ')[-1][-1] == 'V'] for info in course_info]
         keywords = []
-        # for data in course_info:
-        #     keywords.append(data[''])
-        return course_info
+        for info in course_info:
+            name = info['course_name']
+            # Remove the I's and V's from the course names
+            name = (name, ' '.join(name.split(' ')[0:-1]))[
+                name.split(' ')[-1][-1] == 'I' or name.split(' ')[-1][-1] == 'V']
+            keywords.append(name.lower())
+        keywords.append('computer science')
+        keywords.append('computer')
+        keywords.append('cs')
+        keywords.append('cst')
+        return set(keywords)
 
     # gets the most common keywords for post titles
     def get_common_title_keywords(self, data):
@@ -71,13 +81,16 @@ class Analyzer:
         computer_words = {'computer', 'science', 'technology'}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
+
     # gets posts and returns a list sorted by number of upvotes
     def get_most_upvoted_posts(self, data):
         # sorting most popular posts
         return self.__fill_list(data)[:5]
+
     def get_least_upvoted_posts(self, data):
         # sorting most popular posts
         return self.__fill_list(data)[-5:]
+
     def __fill_list(self, data):
         cs_posts = []
         for i in data['data']['children']:
@@ -102,14 +115,16 @@ class Analyzer:
         plt.savefig('./graphs/frequency_of_dates_plot.pdf')
         plt.show()
 
+
 if __name__ == '__main__':
     s = RedditScraper()
+
     submissions = s.search_submission(['computer science'])
     # comments = s.search_comments(['computer science'])
     a = Analyzer()
     a.get_common_title_keywords(submissions)
-    # a.get_common_text_keywords(comments, "comment")
-    # a.get_common_text_keywords(submissions, "submission")
-    # a.get_cs_keywords()
-    # a.get_monthly_frequency(["computer science"])
+
+    a = Analyzer()
+    for post in s.search_submission(list(a.get_cs_keywords())):
+        print(post['title'])
 
