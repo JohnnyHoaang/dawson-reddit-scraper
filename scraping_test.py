@@ -5,8 +5,20 @@ from nltk import FreqDist
 import nltk
 nltk.download('stopwords')
 nltk.download('punkt')
+from databases import CourseScrapingDatabase
 
 class Analyzer:
+    def get_cs_keywords(self):
+        with CourseScrapingDatabase() as database:
+            course_info = database.get_all_course_info()
+        
+
+        keywords = []
+        # for data in course_info:
+        #     keywords.append(data[''])
+        return course_info
+
+
     # gets the most common keywords for post titles
     def get_common_title_keywords(self, data):
         all_titles = ""
@@ -79,30 +91,25 @@ class Analyzer:
         return sorted_cs_posts
 
 if __name__ == '__main__':
-    s = RedditScraper()
-    submissions = s.search_submission(['computer science'])
-    comments = s.search_comments(['computer science'])
+    # s = RedditScraper()
+    # submissions = s.search_submission(['computer science'])
+    # comments = s.search_comments(['computer science'])
     a = Analyzer()
-    # print(f'Average post length: {a.get_average_length_data(submissions, "submission")}')
-    # print(f'Average comment length: {a.get_average_length_data(comments, "comment")}')
+
     a.get_common_title_keywords(submissions)
     a.get_common_text_keywords(comments, "comment")
     a.get_common_text_keywords(submissions, "submission")
 
-
-
-    # from reddit_scraper import RedditAPIScraper
-    # ras = RedditAPIScraper()
-    # ras_data = ras.search(['computer science'])
     # jan_mar = [1609462800, 1617152400]
     # apr_jun = [1617238800, 1625014800]
     # jul_sep = [1625101200, 1632963600]
     # oct_dec = [1633050000, 1640912400]
-    # q1 = (ras.search_dates(['computer science'], jan_mar))
-    # q2 = (ras.search_dates(['computer science'], apr_jun))
-    # q3 = (ras.search_dates(['computer science'], jul_sep))
-    # q4 = (ras.search_dates(['computer science'], oct_dec))
-    # print(f"January to March: {q1['data']['children'][0]['data']['title']}")
-    # print(f"April to June: {q2['data']['children'][0]['data']['title']}")
-    # print(f"July to September: {q3['data']['children'][0]['data']['title']}")
-    # print(f"October to December: {len(q4)}")
+    #
+    # q1 = len(s.search_dates(['computer science'], jan_mar))
+    # q2 = len(s.search_dates(['computer science'], apr_jun))
+    # q3 = len(s.search_dates(['computer science'], jul_sep))
+    # q4 = len(s.search_dates(['computer science'], oct_dec))
+    # print(f"January to March: {q1}")
+    # print(f"April to June: {q2}")
+    # print(f"July to September: {q3}")
+    # print(f"October to December: {q4}")

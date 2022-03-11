@@ -28,11 +28,17 @@ class OracleDB:
             cur.execute(insert_statement, values)
 
     # reads from the db using a query and returns a list of the rows returned
-    def select(self, query: str) -> list[tuple]:
-        data = []
+    def select(self, query: str) -> list[dict]:
         with self.conn.cursor() as cur:
-            for row in cur.execute(query):
-                data.append(row)
+            cur.execute(query)
+            rows = cur.fetchall()
+            col_names = [row[0] for row in cur.description]
+        data = []
+        for row in rows:
+            value = {}
+            for i in range(len(col_names)):
+                value[col_names[i].lower()] = row[i]
+            data.append(value)
         return data
 
     # Executes and arbitrary string of sql code
@@ -94,6 +100,13 @@ class CourseScrapingDatabase:
                       course['homework_hours'],
                       course['total_hours'])
             self.__database.populate_table('courses', values)
+
+    def get_all_course_info(self):
+        return self.__database.select('''select * from courses
+        inner join courses_terms
+        using (course_number)
+        inner join terms
+        using (term_number)''')
 
     # populates the course_terms tables with a list of dictionaries containing the
     def populate_course_terms(self, data: list[dict]):
