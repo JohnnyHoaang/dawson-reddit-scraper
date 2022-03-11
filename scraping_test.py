@@ -2,7 +2,9 @@ from reddit_scraper import RedditScraper
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 from nltk import FreqDist
-
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 
 class Analyzer:
     # gets the most common keywords for post titles
@@ -87,28 +89,20 @@ if __name__ == '__main__':
     a.get_common_text_keywords(comments, "comment")
     a.get_common_text_keywords(submissions, "submission")
 
-    jan_mar = [1609462800, 1617152400]
-    apr_jun = [1617238800, 1625014800]
-    jul_sep = [1625101200, 1632963600]
-    oct_dec = [1633050000, 1640912400]
 
-    # q1 = len(s.search_dates(['computer science'], jan_mar))
-    # q2 = len(s.search_dates(['computer science'], apr_jun))
-    # q3 = len(s.search_dates(['computer science'], jul_sep))
-    # q4 = len(s.search_dates(['computer science'], oct_dec))
-    # print(f"January to March: {q1}")
-    # print(f"April to June: {q2}")
-    # print(f"July to September: {q3}")
-    # print(f"October to December: {q4}")
 
-    from reddit_scraper import RedditAPIScraper
-    ras = RedditAPIScraper()
-    ras_data = ras.search(['computer science'])
-
-    most_upvoted_list = a.get_most_upvoted_posts(ras_data)
-    for i in most_upvoted_list:
-        print(i)
-
-    least_upvoted_list = a.get_least_upvoted_posts(ras_data)
-    for i in least_upvoted_list:
-        print(i)
+    # from reddit_scraper import RedditAPIScraper
+    # ras = RedditAPIScraper()
+    # ras_data = ras.search(['computer science'])
+    # jan_mar = [1609462800, 1617152400]
+    # apr_jun = [1617238800, 1625014800]
+    # jul_sep = [1625101200, 1632963600]
+    # oct_dec = [1633050000, 1640912400]
+    # q1 = (ras.search_dates(['computer science'], jan_mar))
+    # q2 = (ras.search_dates(['computer science'], apr_jun))
+    # q3 = (ras.search_dates(['computer science'], jul_sep))
+    # q4 = (ras.search_dates(['computer science'], oct_dec))
+    # print(f"January to March: {q1['data']['children'][0]['data']['title']}")
+    # print(f"April to June: {q2['data']['children'][0]['data']['title']}")
+    # print(f"July to September: {q3['data']['children'][0]['data']['title']}")
+    # print(f"October to December: {len(q4)}")

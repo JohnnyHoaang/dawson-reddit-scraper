@@ -25,3 +25,4 @@ for i in res2.json()['data']['children']:
 sorted_cs_posts = sorted(cs_posts, key=lambda value: value['ups'], reverse=True)
 for i in sorted_cs_posts:
     print(i)
+

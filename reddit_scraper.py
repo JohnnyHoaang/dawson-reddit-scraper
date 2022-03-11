@@ -39,6 +39,7 @@ class RedditAPIScraper:
     __SECRET_KEY = "KZXLffRmt_pOnZoisA8pLzE4r3zegQ"
     __headers = None
     __url = 'https://oauth.reddit.com/r/dawson/search/?restrict_sr=dawson'
+    __url_comments = 'https://oauth.reddit.com/r/dawson/comments/?restrict_sr=dawson'
 
     def __assign_headers(self):
         import requests
@@ -64,6 +65,14 @@ class RedditAPIScraper:
             param += key + '|'
         return self.__request({'q': param[0:-1]})
 
+    def search_dates(self, keyword: list[str], periods: list[int]):
+        param = ""
+        for key in keyword:
+            param += key + '|'
+        return self.__request({'q': param[0:-1], 'timestamp': f"{periods[0]}...{periods[1]}"})
+
+    # def search_comments(self, id):
+    #     return self.__request({})
 
 if __name__ == '__main__':
     # pushshift api scraper
