@@ -61,14 +61,28 @@ class Analyzer:
         computer_words = {'computer', 'science', 'technology'}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
+    # gets posts and returns a list sorted by number of upvotes
+    def get_most_upvoted_posts(self, data):
+        # sorting most popular posts
+        return self.__fill_list(data)[:5]
+    def get_least_upvoted_posts(self, data):
+        # sorting most popular posts
+        return self.__fill_list(data)[-5:]
+    def __fill_list(self, data):
+        cs_posts = []
+        for i in data['data']['children']:
+            post = {'title': i['data']['title'], 'ups': i['data']['ups'], 'body': i['data']['selftext_html']}
+            cs_posts.append(post)
+        sorted_cs_posts = sorted(cs_posts, key=lambda value: value['ups'], reverse=True)
+        return sorted_cs_posts
 
 if __name__ == '__main__':
     s = RedditScraper()
     submissions = s.search_submission(['computer science'])
     comments = s.search_comments(['computer science'])
     a = Analyzer()
-    print(f'Average post length: {a.get_average_length_data(submissions, "submission")}')
-    print(f'Average comment length: {a.get_average_length_data(comments, "comment")}')
+    # print(f'Average post length: {a.get_average_length_data(submissions, "submission")}')
+    # print(f'Average comment length: {a.get_average_length_data(comments, "comment")}')
     a.get_common_title_keywords(submissions)
     a.get_common_text_keywords(comments, "comment")
     a.get_common_text_keywords(submissions, "submission")
@@ -77,11 +91,24 @@ if __name__ == '__main__':
     apr_jun = [1617238800, 1625014800]
     jul_sep = [1625101200, 1632963600]
     oct_dec = [1633050000, 1640912400]
-    q1 = len(s.search_dates(['computer science'], jan_mar))
-    q2 = len(s.search_dates(['computer science'], apr_jun))
-    q3 = len(s.search_dates(['computer science'], jul_sep))
-    q4 = len(s.search_dates(['computer science'], oct_dec))
-    print(f"January to March: {q1}")
-    print(f"April to June: {q2}")
-    print(f"July to September: {q3}")
-    print(f"October to December: {q4}")
+
+    # q1 = len(s.search_dates(['computer science'], jan_mar))
+    # q2 = len(s.search_dates(['computer science'], apr_jun))
+    # q3 = len(s.search_dates(['computer science'], jul_sep))
+    # q4 = len(s.search_dates(['computer science'], oct_dec))
+    # print(f"January to March: {q1}")
+    # print(f"April to June: {q2}")
+    # print(f"July to September: {q3}")
+    # print(f"October to December: {q4}")
+
+    from reddit_scraper import RedditAPIScraper
+    ras = RedditAPIScraper()
+    ras_data = ras.search(['computer science'])
+
+    most_upvoted_list = a.get_most_upvoted_posts(ras_data)
+    for i in most_upvoted_list:
+        print(i)
+
+    least_upvoted_list = a.get_least_upvoted_posts(ras_data)
+    for i in least_upvoted_list:
+        print(i)
