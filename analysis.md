@@ -7,8 +7,6 @@ How many posts are posted for each week or month of the year? during admission t
  ---
 Relevant keywords:
 - course names
-- course numbers
-- descriptions -> only proper nouns
 - computer science words:
   - computer
   - computer science
