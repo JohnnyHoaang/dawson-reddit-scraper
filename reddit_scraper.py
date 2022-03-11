@@ -7,7 +7,8 @@ class RedditScraper:
     __url = "https://api.pushshift.io/reddit/search/submission/?subreddit=Dawson"
     __url_comment = "https://api.pushshift.io/reddit/search/comment/?subreddit=Dawson"
 
-    def __request(self, url, query_params: dict):
+    @staticmethod
+    def __request(url, query_params: dict):
         page = requests.get(url, query_params)
         if page.status_code != 200:
             raise InvalidCodeException("The page status is not 200")
