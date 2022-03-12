@@ -24,37 +24,49 @@ class Analyzer:
         keywords.append('cs')
         keywords.append('cst')
         return set(keywords)
+    # makes charts and converts them into a pdf file
+    def __make_charts(self, all_data, data_type, most_common_path, least_common_path):
+        import matplotlib.pyplot as plt
+        most_common = FreqDist(self.__filter_data(all_data))
+        fig = plt.figure()
+        fig.set_size_inches(20, 10.5)
+        plt.gcf().subplots_adjust(bottom=0.15)
+        plt.title(f"Most common keywords from {data_type} ")
+        most_common.plot(5)
+        fig.savefig(most_common_path)
+        fig_2 = plt.figure()
+        fig_2.set_size_inches(20, 10.5)
+        plt.gcf().subplots_adjust(bottom=0.15)
+        least_common = FreqDist(most_common.most_common()[-5:])
+        plt.title(f"Least common keywords from {data_type} ")
+        least_common.plot()
+        fig_2.savefig(least_common_path)
 
-    # gets the most common keywords for post titles
-    def get_common_title_keywords(self, data):
+    # plots the most common keywords for post titles
+    def get_common_title_keywords_charts(self, data):
         all_titles = ""
         for i in data:
             import string
             all_titles += f"{i['title']} "
         # titles
-        freq = FreqDist(self.__filter_data(all_titles))
-        print("most common title keywords:")
-        print(freq.most_common(5))
-        print("least common title keywords:")
-        print(freq.most_common()[-5:])
-
-    # gets the most common keywords for post or comment text
+        self.__make_charts(all_titles, 'titles',
+                           './graphs/most_popular_title_keywords.pdf',
+                           './graphs/least_popular_title_keywords.pdf')
+    # plots the most common keywords for post or comment text
     def get_common_text_keywords(self, data, data_type):
         all_text = ""
         for i in data:
             import string
             # remove punctuation
-            if data_type == "submission":
+            if data_type == "submissions":
                 all_text += f"{i['selftext'].translate(str.maketrans('', '', string.punctuation))} "
-            elif data_type == "comment":
+            elif data_type == "comments":
                 all_text += f"{i['body'].translate(str.maketrans('', '', string.punctuation))} "
             else:
                 raise Exception
-        freq = FreqDist(self.__filter_data(all_text))
-        print("most common title keywords:")
-        print(freq.most_common(5))
-        print("least common title keywords:")
-        print(freq.most_common()[-5:])
+        self.__make_charts(all_text, data_type,
+                           f'./graphs/most_popular_{data_type}_text_keywords.pdf',
+                           f'./graphs/least_popular_{data_type}_text_keywords.pdf')
 
     # gets the average length of posts or comments
     def get_average_length_data(self, data, data_type):
@@ -63,9 +75,9 @@ class Analyzer:
         average_length = 0
         for i in data:
             count_data += 1
-            if data_type == "submission":
+            if data_type == "submissions":
                 text = i['selftext']
-            elif data_type == "comment":
+            elif data_type == "comments":
                 text = i["body"]
             else:
                 raise Exception
@@ -78,7 +90,7 @@ class Analyzer:
         stop_words = set(stopwords.words('english'))
         filter_data = word_tokenize(data)
         filtered = [d for d in filter_data if not d.casefold() in stop_words]
-        computer_words = {'computer', 'science', 'technology'}
+        computer_words = {'computer', 'science', 'technology', '?', "'" , ","}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
 
@@ -120,11 +132,10 @@ if __name__ == '__main__':
     s = RedditScraper()
 
     submissions = s.search_submission(['computer science'])
+    comments = s.search_comments(['computer science'])
     # comments = s.search_comments(['computer science'])
     a = Analyzer()
-    a.get_common_title_keywords(submissions)
-
-    a = Analyzer()
-    for post in s.search_submission(list(a.get_cs_keywords())):
-        print(post['title'])
-
+    a.get_common_title_keywords_charts(submissions)
+    a.get_common_text_keywords(comments, 'comments')
+    a.get_common_text_keywords(submissions, 'submissions')
+    a.get_monthly_frequency(['computer science'])

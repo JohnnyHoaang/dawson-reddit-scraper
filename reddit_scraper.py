@@ -101,4 +101,4 @@ if __name__ == '__main__':
     # reddit api scraper
     ras = RedditAPIScraper()
     ras_data = ras.search(['computer science'])
-    print(ras_data['data']['children'][0]['data']['title'])
+
