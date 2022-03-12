@@ -60,7 +60,6 @@ class Analyzer:
         all_text = ""
         for i in data:
             import string
-            print(string.punctuation)
             # remove punctuation
             if data_type == "submissions":
                 all_text += f"{i['selftext'].translate(str.maketrans('', '', string.punctuation))} "
@@ -88,7 +87,19 @@ class Analyzer:
             length_data += len(text)
         average_length = length_data / count_data
         return average_length
-
+    # returns the number of sentences of a post or comment
+    def get_number_of_sentences(self, data, data_type):
+        text = ''
+        count = 0
+        count_sentence = 0
+        for i in data:
+            if data_type == "comments":
+                text = i['body']
+            elif data_type == "submissions":
+                text = i['selftext']
+            count_sentence += len(sent_tokenize(text))
+            count += 1
+        return count_sentence/count
     # removes stop words and other to filter
     def __filter_data(self, data):
         stop_words = set(stopwords.words('english'))
@@ -116,26 +127,25 @@ class Analyzer:
         return sorted_cs_posts
     # returns the epoch values for each month
     def __get_epoch_values(self):
-        months = { "january":[1609459200, 1612051200], "february":[1612137600, 1614470400],
-                   "march" :[1614556800, 1617148800], "april": [1617235200, 1619740800],
-                   "may": [1619827200, 1622419200], "june": [1622505600, 1625011200],
-                   "july": [1625097600, 1627689600],"august": [1627776000, 1630368000],
-                   "september": [1630454400, 1632960000],"october": [1633046400, 1635638400],
-                   "november": [1635724800, 1638230400],"december": [1638316800, 1640908800]}
+        # months = { "january":[1609459200, 1612051200], "february":[1612137600, 1614470400],
+        #            "march" :[1614556800, 1617148800], "april": [1617235200, 1619740800],
+        #            "may": [1619827200, 1622419200], "june": [1622505600, 1625011200],
+        #            "july": [1625097600, 1627689600],"august": [1627776000, 1630368000],
+        #            "september": [1630454400, 1632960000],"october": [1633046400, 1635638400],
+        #            "november": [1635724800, 1638230400],"december": [1638316800, 1640908800]}
+        months = {"jan-mar":[1609459200, 1617148800], "apr-jun" : [1617235200,1625011200], "jul-sep" :[1625097600, 1632960000], "oct-dec" :[1633046400,1640908800]}
         return months
     def __get_all_posts_from_dates(self, keywords, months):
-        return [len(s.search_dates(keywords, months["january"])),len(s.search_dates(keywords, months["february"])),len(s.search_dates(keywords, months["march"])),
-                len(s.search_dates(keywords, months["april"])),len(s.search_dates(keywords, months["may"])),len(s.search_dates(keywords, months["june"])),
-                len(s.search_dates(keywords, months["july"])),len(s.search_dates(keywords, months["august"])),len(s.search_dates(keywords, months["september"])),
-                len(s.search_dates(keywords, months["october"])),len(s.search_dates(keywords, months["november"])),len(s.search_dates(keywords, months["december"]))]
+        values =  [len(s.search_dates(keywords, months["jan-mar"])),len(s.search_dates(keywords, months["apr-jun"])),len(s.search_dates(keywords, months["jul-sep"])),
+                len(s.search_dates(keywords, months["oct-dec"]))]
+        return values
+    # plots the amount of post per interval of months
     def get_monthly_frequency(self, keywords):
         import matplotlib.pyplot as plt
         all_months = self.__get_epoch_values()
         # names = all_months.keys()
-        names = ["january", "february", "march"]
-        # values = self.__get_all_posts_from_dates()
-        # ^ this throws an error because it requests the same page too many times
-        values = [len(s.search_dates(keywords, all_months["january"])),len(s.search_dates(keywords, all_months["february"])), len(s.search_dates(keywords, all_months["march"]))]
+        names = ["january-march", "april-june", "july-september", "october-december"]
+        values = self.__get_all_posts_from_dates(keywords, all_months)
         plt.title("Frequency of posts by months")
         plt.bar(names, values)
         plt.savefig('./graphs/frequency_of_dates_plot.pdf')
@@ -148,9 +158,10 @@ if __name__ == '__main__':
     s = RedditScraper()
     submissions = s.search_submission(['computer science'])
     comments = s.search_comments(['computer science'])
-    comments = s.search_comments(['computer science'])
     a = Analyzer()
-    a.get_common_title_keywords_charts(submissions)
-    a.get_common_text_keywords(comments, 'comments')
-    a.get_common_text_keywords(submissions, 'submissions')
+    # a.get_common_title_keywords_charts(submissions)
+    # a.get_common_text_keywords(comments, 'comments')
+    # a.get_common_text_keywords(submissions, 'submissions')
     a.get_monthly_frequency(['computer science'])
+    print(a.get_number_of_sentences(submissions, "submissions"))
+    print(a.get_number_of_sentences(comments, "comments"))
