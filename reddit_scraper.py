@@ -9,7 +9,7 @@ class RedditScraper:
 
     @staticmethod
     def __request(url, query_params: dict):
-        print(query_params)
+        # print(query_params)
         page = requests.get(url, query_params)
         if page.status_code != 200:
             raise InvalidCodeException("The page status is not 200")

@@ -5,6 +5,7 @@ from nltk import FreqDist
 import nltk
 from databases import CourseScrapingDatabase
 
+
 class Analyzer:
 
     def get_cs_keywords(self) -> set:
@@ -24,8 +25,9 @@ class Analyzer:
         keywords.append('cs')
         keywords.append('cst')
         return set(keywords)
+
     # makes charts and converts them into a pdf file
-    def __make_charts(self, all_data, data_type, most_common_path, least_common_path):
+    def __make_keyword_charts(self, all_data, data_type, most_common_path, least_common_path):
         import matplotlib.pyplot as plt
         most_common = FreqDist(self.__filter_data(all_data))
         fig = plt.figure()
@@ -47,16 +49,18 @@ class Analyzer:
         all_titles = ""
         for i in data:
             import string
-            all_titles += f"{i['title']} "
+            all_titles += f"{i['title'].translate(str.maketrans('', '', string.punctuation))} "
         # titles
-        self.__make_charts(all_titles, 'titles',
-                           './graphs/most_popular_title_keywords.pdf',
-                           './graphs/least_popular_title_keywords.pdf')
+        self.__make_keyword_charts(all_titles, 'titles',
+                                   './graphs/most_popular_title_keywords.pdf',
+                                   './graphs/least_popular_title_keywords.pdf')
+
     # plots the most common keywords for post or comment text
     def get_common_text_keywords(self, data, data_type):
         all_text = ""
         for i in data:
             import string
+            print(string.punctuation)
             # remove punctuation
             if data_type == "submissions":
                 all_text += f"{i['selftext'].translate(str.maketrans('', '', string.punctuation))} "
@@ -64,9 +68,9 @@ class Analyzer:
                 all_text += f"{i['body'].translate(str.maketrans('', '', string.punctuation))} "
             else:
                 raise Exception
-        self.__make_charts(all_text, data_type,
-                           f'./graphs/most_popular_{data_type}_text_keywords.pdf',
-                           f'./graphs/least_popular_{data_type}_text_keywords.pdf')
+        self.__make_keyword_charts(all_text, data_type,
+                                   f'./graphs/most_popular_{data_type}_text_keywords.pdf',
+                                   f'./graphs/least_popular_{data_type}_text_keywords.pdf')
 
     # gets the average length of posts or comments
     def get_average_length_data(self, data, data_type):
@@ -90,7 +94,7 @@ class Analyzer:
         stop_words = set(stopwords.words('english'))
         filter_data = word_tokenize(data)
         filtered = [d for d in filter_data if not d.casefold() in stop_words]
-        computer_words = {'computer', 'science', 'technology', '?', "'" , ","}
+        computer_words = {'computer', 'science', 'technology'}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
 
@@ -110,30 +114,41 @@ class Analyzer:
             cs_posts.append(post)
         sorted_cs_posts = sorted(cs_posts, key=lambda value: value['ups'], reverse=True)
         return sorted_cs_posts
+    # returns the epoch values for each month
+    def __get_epoch_values(self):
+        months = { "january":[1609459200, 1612051200], "february":[1612137600, 1614470400],
+                   "march" :[1614556800, 1617148800], "april": [1617235200, 1619740800],
+                   "may": [1619827200, 1622419200], "june": [1622505600, 1625011200],
+                   "july": [1625097600, 1627689600],"august": [1627776000, 1630368000],
+                   "september": [1630454400, 1632960000],"october": [1633046400, 1635638400],
+                   "november": [1635724800, 1638230400],"december": [1638316800, 1640908800]}
+        return months
+    def __get_all_posts_from_dates(self, keywords, months):
+        return [len(s.search_dates(keywords, months["january"])),len(s.search_dates(keywords, months["february"])),len(s.search_dates(keywords, months["march"])),
+                len(s.search_dates(keywords, months["april"])),len(s.search_dates(keywords, months["may"])),len(s.search_dates(keywords, months["june"])),
+                len(s.search_dates(keywords, months["july"])),len(s.search_dates(keywords, months["august"])),len(s.search_dates(keywords, months["september"])),
+                len(s.search_dates(keywords, months["october"])),len(s.search_dates(keywords, months["november"])),len(s.search_dates(keywords, months["december"]))]
     def get_monthly_frequency(self, keywords):
         import matplotlib.pyplot as plt
-        jan_mar = [1609462800, 1617152400]
-        apr_jun = [1617238800, 1625014800]
-        jul_sep = [1625101200, 1632963600]
-        oct_dec = [1633050000, 1640912400]
-        q1 = len(s.search_dates(keywords, jan_mar))
-        q2 = len(s.search_dates(keywords, apr_jun))
-        q3 = len(s.search_dates(keywords, jul_sep))
-        q4 = len(s.search_dates(keywords, oct_dec))
-        names = ["jan-mar", "apr-jun", "jul-sep", "oct-dec"]
-        values = [q1, q2, q3, q4]
+        all_months = self.__get_epoch_values()
+        # names = all_months.keys()
+        names = ["january", "february", "march"]
+        # values = self.__get_all_posts_from_dates()
+        # ^ this throws an error because it requests the same page too many times
+        values = [len(s.search_dates(keywords, all_months["january"])),len(s.search_dates(keywords, all_months["february"])), len(s.search_dates(keywords, all_months["march"]))]
         plt.title("Frequency of posts by months")
         plt.bar(names, values)
         plt.savefig('./graphs/frequency_of_dates_plot.pdf')
         plt.show()
 
 
+
+
 if __name__ == '__main__':
     s = RedditScraper()
-
     submissions = s.search_submission(['computer science'])
     comments = s.search_comments(['computer science'])
-    # comments = s.search_comments(['computer science'])
+    comments = s.search_comments(['computer science'])
     a = Analyzer()
     a.get_common_title_keywords_charts(submissions)
     a.get_common_text_keywords(comments, 'comments')
