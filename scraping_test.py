@@ -87,6 +87,7 @@ class Analyzer:
             length_data += len(text)
         average_length = length_data / count_data
         return average_length
+
     # returns the number of sentences of a post or comment
     def get_number_of_sentences(self, data, data_type):
         text = ''
@@ -100,6 +101,15 @@ class Analyzer:
             count_sentence += len(sent_tokenize(text))
             count += 1
         return count_sentence/count
+
+    def make_chart_average_number_of_sentence(self, submissions, comments):
+        import matplotlib.pyplot as plt
+        names = ["submissions", "comments"]
+        values = [self.get_number_of_sentences(submissions, "submissions"), self.get_number_of_sentences(comments, "comments")]
+        plt.title("Average number of sentences for posts and comments")
+        plt.bar(names, values)
+        plt.savefig("./graphs/average_num_of_sentences.pdf")
+        plt.show()
     # removes stop words and other to filter
     def __filter_data(self, data):
         stop_words = set(stopwords.words('english'))
@@ -125,6 +135,7 @@ class Analyzer:
             cs_posts.append(post)
         sorted_cs_posts = sorted(cs_posts, key=lambda value: value['ups'], reverse=True)
         return sorted_cs_posts
+
     # returns the epoch values for each month
     def __get_epoch_values(self):
         # months = { "january":[1609459200, 1612051200], "february":[1612137600, 1614470400],
@@ -151,9 +162,6 @@ class Analyzer:
         plt.savefig('./graphs/frequency_of_dates_plot.pdf')
         plt.show()
 
-
-
-
 if __name__ == '__main__':
     s = RedditScraper()
     submissions = s.search_submission(['computer science'])
@@ -162,6 +170,5 @@ if __name__ == '__main__':
     # a.get_common_title_keywords_charts(submissions)
     # a.get_common_text_keywords(comments, 'comments')
     # a.get_common_text_keywords(submissions, 'submissions')
-    a.get_monthly_frequency(['computer science'])
-    print(a.get_number_of_sentences(submissions, "submissions"))
-    print(a.get_number_of_sentences(comments, "comments"))
+    # a.get_monthly_frequency(['computer science'])
+    a.make_chart_average_number_of_sentence(submissions, comments)
