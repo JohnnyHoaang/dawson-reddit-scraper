@@ -31,13 +31,15 @@ class Analyzer:
         import matplotlib.pyplot as plt
         most_common = FreqDist(self.__filter_data(all_data))
         fig = plt.figure()
-        fig.set_size_inches(20, 10.5)
+        # readjusts the size of the figure
+        fig.set_size_inches(10, 10)
         plt.gcf().subplots_adjust(bottom=0.15)
         plt.title(f"Most common keywords from {data_type} ")
         most_common.plot(5)
+        print(most_common.most_common(5))
         fig.savefig(most_common_path)
         fig_2 = plt.figure()
-        fig_2.set_size_inches(20, 10.5)
+        fig_2.set_size_inches(10, 10)
         plt.gcf().subplots_adjust(bottom=0.15)
         least_common = FreqDist(most_common.most_common()[-5:])
         plt.title(f"Least common keywords from {data_type} ")
@@ -52,8 +54,8 @@ class Analyzer:
             all_titles += f"{i['title'].translate(str.maketrans('', '', string.punctuation))} "
         # titles
         self.__make_keyword_charts(all_titles, 'titles',
-                                   './graphs/most_popular_title_keywords.pdf',
-                                   './graphs/least_popular_title_keywords.pdf')
+                                   './graphs/most_popular_title_keywords.png',
+                                   './graphs/least_popular_title_keywords.png')
 
     # plots the most common keywords for post or comment text
     def get_common_text_keywords(self, data, data_type):
@@ -68,8 +70,8 @@ class Analyzer:
             else:
                 raise Exception
         self.__make_keyword_charts(all_text, data_type,
-                                   f'./graphs/most_popular_{data_type}_text_keywords.pdf',
-                                   f'./graphs/least_popular_{data_type}_text_keywords.pdf')
+                                   f'./graphs/most_popular_{data_type}_text_keywords.png',
+                                   f'./graphs/least_popular_{data_type}_text_keywords.png')
 
     # gets the average length of posts or comments
     def get_average_length_data(self, data, data_type):
@@ -89,7 +91,7 @@ class Analyzer:
         return average_length
 
     # returns the number of sentences of a post or comment
-    def get_number_of_sentences(self, data, data_type):
+    def __get_number_of_sentences(self, data, data_type):
         text = ''
         count = 0
         count_sentence = 0
@@ -100,16 +102,19 @@ class Analyzer:
                 text = i['selftext']
             count_sentence += len(sent_tokenize(text))
             count += 1
-        return count_sentence/count
+        return count_sentence / count
 
+    # generates a graph that represents the average number of sentences for posts and comments
     def make_chart_average_number_of_sentence(self, submissions, comments):
         import matplotlib.pyplot as plt
         names = ["submissions", "comments"]
-        values = [self.get_number_of_sentences(submissions, "submissions"), self.get_number_of_sentences(comments, "comments")]
+        values = [self.__get_number_of_sentences(submissions, "submissions"),
+                  self.__get_number_of_sentences(comments, "comments")]
         plt.title("Average number of sentences for posts and comments")
         plt.bar(names, values)
-        plt.savefig("./graphs/average_num_of_sentences.pdf")
+        plt.savefig("./graphs/average_num_of_sentences.png")
         plt.show()
+
     # removes stop words and other to filter
     def __filter_data(self, data):
         stop_words = set(stopwords.words('english'))
@@ -144,23 +149,28 @@ class Analyzer:
         #            "july": [1625097600, 1627689600],"august": [1627776000, 1630368000],
         #            "september": [1630454400, 1632960000],"october": [1633046400, 1635638400],
         #            "november": [1635724800, 1638230400],"december": [1638316800, 1640908800]}
-        months = {"jan-mar":[1609459200, 1617148800], "apr-jun" : [1617235200,1625011200], "jul-sep" :[1625097600, 1632960000], "oct-dec" :[1633046400,1640908800]}
+        months = {"jan-mar": [1609459200, 1617148800], "apr-jun": [1617235200, 1625011200],
+                  "jul-sep": [1625097600, 1632960000], "oct-dec": [1633046400, 1640908800]}
         return months
+
     def __get_all_posts_from_dates(self, keywords, months):
-        values =  [len(s.search_dates(keywords, months["jan-mar"])),len(s.search_dates(keywords, months["apr-jun"])),len(s.search_dates(keywords, months["jul-sep"])),
-                len(s.search_dates(keywords, months["oct-dec"]))]
+        values = [len(s.search_dates(keywords, months["jan-mar"])), len(s.search_dates(keywords, months["apr-jun"])),
+                  len(s.search_dates(keywords, months["jul-sep"])),
+                  len(s.search_dates(keywords, months["oct-dec"]))]
         return values
-    # plots the amount of post per interval of months
+
+    # plots the amount of posts per interval of months
     def get_monthly_frequency(self, keywords):
         import matplotlib.pyplot as plt
         all_months = self.__get_epoch_values()
         # names = all_months.keys()
         names = ["january-march", "april-june", "july-september", "october-december"]
         values = self.__get_all_posts_from_dates(keywords, all_months)
-        plt.title("Frequency of posts by months")
+        plt.title("Frequency of posts by months in 2021")
         plt.bar(names, values)
-        plt.savefig('./graphs/frequency_of_dates_plot.pdf')
+        plt.savefig('./graphs/frequency_of_dates_plot.png')
         plt.show()
+
 
 if __name__ == '__main__':
     s = RedditScraper()
@@ -171,4 +181,4 @@ if __name__ == '__main__':
     # a.get_common_text_keywords(comments, 'comments')
     # a.get_common_text_keywords(submissions, 'submissions')
     # a.get_monthly_frequency(['computer science'])
-    a.make_chart_average_number_of_sentence(submissions, comments)
+    print(comments[19]['body'])
