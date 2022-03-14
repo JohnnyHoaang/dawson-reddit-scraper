@@ -1,7 +1,8 @@
 import requests
 from course_list_scraper import InvalidCodeException
 import json
-
+import os
+from json.decoder import JSONDecodeError
 
 class RedditScraper:
     __url = "https://api.pushshift.io/reddit/search/submission/?subreddit=Dawson"
@@ -32,6 +33,32 @@ class RedditScraper:
         for key in keyword:
             param += key + '|'
         return self.__request(self.__url, {'q': param[0:-1], 'after': periods[0], 'before': periods[1]})
+
+
+# Used to read and compare the datasets
+class RedditDataSaver:
+    file_path = os.path.join('local_data', 'pushshift_data.json')
+    def __init__(self):
+        if not os.path.isdir(os.path.dirname(self.file_path)):
+            os.makedirs(os.path.dirname(self.file_path))
+            if not os.path.isfile(self.file_path):
+                with open(self.file_path, 'w') as file:
+                    pass
+
+    def get_last_post_date(self):
+        with open(self.file_path, 'r') as file:
+            try:
+                data = json.load(file)
+            except JSONDecodeError:
+                return -1
+            return data[0]['created_utc']
+
+    def __compare_data(self, data_set_1, data_set_2):
+        pass
+
+    def __save_to_file(self, data: list[dict]):
+        with open(self.file_path, 'w') as file:
+            json.dump(data, file)
 
 
 class RedditAPIScraper:
@@ -78,31 +105,33 @@ class RedditAPIScraper:
 
 if __name__ == '__main__':
     from scraping_test import Analyzer
+    r = RedditDataSaver()
+    print(r.get_last_post_date())
     # pushshift api scraper
-    a = Analyzer()
-    s = RedditScraper()
-    data = s.search_submission(a.get_cs_keywords())
-    print(type(data[0]))
-    for b in data[0]:
-        print(b)
-    for d in data:
-
-        if d['title'] == '':
-            print('(no title)')
-        else:
-            print(f"Title: {d['title']}")
-
-        if d['selftext'] == '':
-            print('(no body)')
-        else:
-            print(f"Body: {d['selftext']}")
-
-        if d['author'] == '':
-            print('(no author)')
-        else:
-            print(f"Author: {d['author']}")
-
-        print('______________________________________')
+    # a = Analyzer()
+    # s = RedditScraper()
+    # data = s.search_submission(a.get_cs_keywords())
+    # print(type(data[0]))
+    # for b in data[0]:
+    #     print(b)
+    # for d in data:
+    #
+    #     if d['title'] == '':
+    #         print('(no title)')
+    #     else:
+    #         print(f"Title: {d['title']}")
+    #
+    #     if d['selftext'] == '':
+    #         print('(no body)')
+    #     else:
+    #         print(f"Body: {d['selftext']}")
+    #
+    #     if d['author'] == '':
+    #         print('(no author)')
+    #     else:
+    #         print(f"Author: {d['author']}")
+    #
+    #     print('______________________________________')
     # reddit api scraper
     # ras = RedditAPIScraper()
     # ras_data = ras.search(['computer science'])
