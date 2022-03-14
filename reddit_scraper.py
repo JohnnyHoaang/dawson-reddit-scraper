@@ -42,7 +42,7 @@ class RedditDataSaver:
         if not os.path.isdir(os.path.dirname(self.file_path)):
             os.makedirs(os.path.dirname(self.file_path))
             if not os.path.isfile(self.file_path):
-                with open(self.file_path, 'w') as file:
+                with open(self.file_path, 'w'):
                     pass
 
     def get_last_post_date(self):
