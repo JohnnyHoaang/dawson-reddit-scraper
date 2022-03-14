@@ -39,7 +39,7 @@ class CourseScrapper:
 
         return all_courses
 
-    def get_terms(self) -> list[int]:
+    def get_terms(self):
         content = self.__course_info.find_all('h2', {'class': 'noPadding'})
         terms = []
         for term in content:

@@ -14,14 +14,11 @@ class SQLFileReader:
         self.path = path + extension
 
     # Reads from the file and expects the delimiters to be a ';'
-    def read_statements(self) -> list[str]:
+    def read_statements(self):
         all_lines = self.__read_all_lines()
         statements = all_lines.split(';')[:-1]
         return statements
 
-    def __read_all_lines(self) -> str:
-        all_lines = ''
+    def __read_all_lines(self):
         with open(self.path, 'r') as file:
-            for line in file:
-                all_lines += line.strip()
-        return all_lines
+            return ''.join(file.readlines())
