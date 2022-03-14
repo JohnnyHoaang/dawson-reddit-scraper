@@ -26,7 +26,7 @@ class Analyzer:
         keywords.append('cst')
         return set(keywords)
 
-    # makes charts and converts them into a pdf file
+    # Makes charts and converts them into a pdf file
     def __make_keyword_charts(self, all_data, data_type, most_common_path, least_common_path):
         import matplotlib.pyplot as plt
         most_common = FreqDist(self.__filter_data(all_data))
@@ -37,7 +37,6 @@ class Analyzer:
         plt.title(f"Most common keywords from {data_type} ")
         most_common.plot(5)
         print(most_common.most_common(5))
-        fig.savefig(most_common_path)
         fig_2 = plt.figure()
         fig_2.set_size_inches(10, 10)
         plt.gcf().subplots_adjust(bottom=0.15)
@@ -46,7 +45,7 @@ class Analyzer:
         least_common.plot()
         fig_2.savefig(least_common_path)
 
-    # plots the most common keywords for post titles
+    # Plots the most common keywords for post titles
     def get_common_title_keywords_charts(self, data):
         all_titles = ""
         for i in data:
@@ -57,7 +56,7 @@ class Analyzer:
                                    './graphs/most_popular_title_keywords.png',
                                    './graphs/least_popular_title_keywords.png')
 
-    # plots the most common keywords for post or comment text
+    # Plots the most/least common keywords for post or comment text
     def get_common_text_keywords(self, data, data_type):
         all_text = ""
         for i in data:
@@ -73,7 +72,7 @@ class Analyzer:
                                    f'./graphs/most_popular_{data_type}_text_keywords.png',
                                    f'./graphs/least_popular_{data_type}_text_keywords.png')
 
-    # gets the average length of posts or comments
+    # Returns the average length of posts or comments
     def get_average_length_data(self, data, data_type):
         length_data = 0
         count_data = 0
@@ -90,7 +89,7 @@ class Analyzer:
         average_length = length_data / count_data
         return average_length
 
-    # returns the number of sentences of a post or comment
+    # Returns the number of sentences of a post or comment
     def __get_number_of_sentences(self, data, data_type):
         text = ''
         count = 0
@@ -104,7 +103,7 @@ class Analyzer:
             count += 1
         return count_sentence / count
 
-    # generates a graph that represents the average number of sentences for posts and comments
+    # Generates a graph that represents the average number of sentences for posts and comments
     def make_chart_average_number_of_sentence(self, submissions, comments):
         import matplotlib.pyplot as plt
         names = ["submissions", "comments"]
@@ -115,7 +114,7 @@ class Analyzer:
         plt.savefig("./graphs/average_num_of_sentences.png")
         plt.show()
 
-    # removes stop words and other to filter
+    # Removes stop words and other to filter
     def __filter_data(self, data):
         stop_words = set(stopwords.words('english'))
         filter_data = word_tokenize(data)
@@ -141,7 +140,7 @@ class Analyzer:
         sorted_cs_posts = sorted(cs_posts, key=lambda value: value['ups'], reverse=True)
         return sorted_cs_posts
 
-    # returns the epoch values for each month
+    # Returns the epoch values for each month
     def __get_epoch_values(self):
         # months = { "january":[1609459200, 1612051200], "february":[1612137600, 1614470400],
         #            "march" :[1614556800, 1617148800], "april": [1617235200, 1619740800],
@@ -152,14 +151,14 @@ class Analyzer:
         months = {"jan-mar": [1609459200, 1617148800], "apr-jun": [1617235200, 1625011200],
                   "jul-sep": [1625097600, 1632960000], "oct-dec": [1633046400, 1640908800]}
         return months
-
+    # Returns posts according to months
     def __get_all_posts_from_dates(self, keywords, months):
         values = [len(s.search_dates(keywords, months["jan-mar"])), len(s.search_dates(keywords, months["apr-jun"])),
                   len(s.search_dates(keywords, months["jul-sep"])),
                   len(s.search_dates(keywords, months["oct-dec"]))]
         return values
 
-    # plots the amount of posts per interval of months
+    # Plots the amount of posts per interval of months
     def get_monthly_frequency(self, keywords):
         import matplotlib.pyplot as plt
         all_months = self.__get_epoch_values()
@@ -177,8 +176,7 @@ if __name__ == '__main__':
     submissions = s.search_submission(['computer science'])
     comments = s.search_comments(['computer science'])
     a = Analyzer()
-    # a.get_common_title_keywords_charts(submissions)
-    # a.get_common_text_keywords(comments, 'comments')
-    # a.get_common_text_keywords(submissions, 'submissions')
-    # a.get_monthly_frequency(['computer science'])
-    print(comments[19]['body'])
+    a.get_common_title_keywords_charts(submissions)
+    a.get_common_text_keywords(comments, 'comments')
+    a.get_common_text_keywords(submissions, 'submissions')
+    a.get_monthly_frequency(['computer science'])
