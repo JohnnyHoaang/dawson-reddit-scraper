@@ -38,7 +38,6 @@ class Analyzer:
         plt.title(f"Most common keywords from {data_type} ")
         # Plots most common keywords
         most_common.plot(5)
-        print(most_common.most_common(5))
         fig.savefig(most_common_path)
         fig_2 = plt.figure()
         # create figure for the first plot
@@ -109,7 +108,7 @@ class Analyzer:
         return count_sentence / count
 
     # Generates a graph that represents the average number of sentences for posts and comments
-    def make_chart_average_number_of_sentence(self, submissions, comments):
+    def get_chart_average_number_of_sentence(self, submissions, comments):
         import matplotlib.pyplot as plt
         names = ["submissions", "comments"]
         values = [self.__get_number_of_sentences(submissions, "submissions"),
@@ -124,7 +123,7 @@ class Analyzer:
         stop_words = set(stopwords.words('english'))
         filter_data = word_tokenize(data)
         filtered = [d for d in filter_data if not d.casefold() in stop_words]
-        computer_words = {'computer', 'science', 'technology', 'cs', 'cst' , '’'}
+        computer_words = {'computer', 'science', 'technology', 'cs', 'cst', '’'}
         double_filtered_data = [w for w in filtered if not w.casefold() in computer_words]
         return double_filtered_data
 
@@ -154,9 +153,10 @@ class Analyzer:
 
     # Returns posts according to months
     def __get_all_posts_from_dates(self, keywords, months):
-        values = [len(s.search_dates(keywords, months["jan-mar"])), len(s.search_dates(keywords, months["apr-jun"])),
-                  len(s.search_dates(keywords, months["jul-sep"])),
-                  len(s.search_dates(keywords, months["oct-dec"]))]
+        rs = RedditScraper()
+        values = [len(rs.search_dates(keywords, months["jan-mar"])), len(rs.search_dates(keywords, months["apr-jun"])),
+                  len(rs.search_dates(keywords, months["jul-sep"])),
+                  len(rs.search_dates(keywords, months["oct-dec"]))]
         return values
 
     # Plots the amount of posts per interval of months
@@ -171,12 +171,14 @@ class Analyzer:
         plt.show()
 
 
-if __name__ == '__main__':
-    s = RedditScraper()
-    submissions = s.search_submission(['computer science'])
-    comments = s.search_comments(['computer science'])
+# creates all graphs for the analysis report
+def create_analysis_graphs():
+    rs = RedditScraper()
+    submissions = rs.search_submission(['computer science'])
+    comments = rs.search_comments(['computer science'])
     a = Analyzer()
     a.get_common_title_keywords_charts(submissions)
     a.get_common_text_keywords(comments, 'comments')
     a.get_common_text_keywords(submissions, 'submissions')
+    a.get_chart_average_number_of_sentence(submissions, comments)
     a.get_monthly_frequency(['computer science'])

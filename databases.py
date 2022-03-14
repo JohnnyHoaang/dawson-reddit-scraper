@@ -4,16 +4,16 @@ from db_config import Config
 from file_reader import SQLFileReader
 from course_list_scraper import CourseScrapper
 
-cx_Oracle.init_oracle_client(lib_dir=Config.lib)
+cx_Oracle.init_oracle_client(lib_dir=r"./lib/instantclient_21_3")
 
 
 class OracleDB:
 
-    def __init__(self):
+    def __init__(self, user, pwd):
         link = cx_Oracle.makedsn('198.168.52.211',
                                  1521,
                                  service_name='pdbora19c.dawsoncollege.qc.ca')
-        self.conn = cx_Oracle.connect(Config.user, Config.pwd, dsn=link)
+        self.conn = cx_Oracle.connect(user, pwd, dsn=link)
         self.conn.autocommit = True
 
     # Populates a table with a list of values
@@ -76,8 +76,8 @@ class OracleDB:
 
 
 class CourseScrapingDatabase:
-    def __init__(self):
-        self.__database = OracleDB()
+    def __init__(self, user, pwd):
+        self.__database = OracleDB(user, pwd)
     # Creates the database table using the setup file
     def setup_database(self, setup_file):
         file_reader = SQLFileReader(setup_file)
@@ -125,8 +125,8 @@ class CourseScrapingDatabase:
         self.__database.close()
 
 
-def build_cs_database():
-    with CourseScrapingDatabase() as database:
+def build_cs_database(user, pwd):
+    with CourseScrapingDatabase(user, pwd) as database:
         database.setup_database('database_resources/Setup.sql')
         scrapper = CourseScrapper()
         database.populate_terms(scrapper.get_terms())
