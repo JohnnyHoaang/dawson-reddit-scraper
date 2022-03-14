@@ -18,7 +18,7 @@ class SQLFileReader:
         all_lines = self.__read_all_lines()
         statements = all_lines.split(';')[:-1]
         return statements
-
+    # Returns all lines from file
     def __read_all_lines(self):
         with open(self.path, 'r') as file:
             return ''.join(file.readlines())

@@ -8,25 +8,28 @@ class RedditScraper:
     __url_comment = "https://api.pushshift.io/reddit/search/comment/?subreddit=Dawson"
 
     @staticmethod
+    # Returns json data from page
     def __request(url, query_params):
-        # print(query_params)
         page = requests.get(url, query_params)
         if page.status_code != 200:
             raise InvalidCodeException("The page status is not 200")
         return json.loads(page.content)['data']
 
+    # Returns json data of submissions
     def search_submission(self, keyword):
         param = ""
         for key in keyword:
             param += key + '|'
         return self.__request(self.__url, {'q': param[0:-1], 'size': 100})
 
+    # Returns json data of comments
     def search_comments(self, keyword):
         param = ""
         for key in keyword:
             param += key + '|'
         return self.__request(self.__url_comment, {'q': param[0:-1]})
 
+    # Returns json data of post according to date periods
     def search_dates(self, keyword, periods):
         param = ""
         for key in keyword:
@@ -73,12 +76,9 @@ class RedditAPIScraper:
             param += key + '|'
         return self.__request({'q': param[0:-1], 'timestamp': f"{periods[0]}...{periods[1]}"})
 
-    # def search_comments(self, id):
-    #     return self.__request({})
-
 if __name__ == '__main__':
     from scraping_test import Analyzer
-    # pushshift api scraper
+    # Pushshift API scraper
     a = Analyzer()
     s = RedditScraper()
     data = s.search_submission(a.get_cs_keywords())

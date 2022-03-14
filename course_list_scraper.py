@@ -10,12 +10,14 @@ class CourseScrapper:
         self.__soup = BeautifulSoup(self.__get_page_content(), 'html.parser')
         self.__course_info = self.__soup.find('div', id='include')
 
+    # Returns page content of the request
     def __get_page_content(self):
         page = requests.get(self.url)
         if page.status_code != 200:
             raise InvalidCodeException("The page status is not 200")
         return page.content
 
+    # Returns a list of dicts containing term information
     def get_courses(self):
         all_courses = []
         total_courses = len(self.__course_info.find_all('tr', {'onmouseout': 'this.style.backgroundColor="#ffffff";'}))
@@ -39,6 +41,7 @@ class CourseScrapper:
 
         return all_courses
 
+    # Returns a list of dicts containing term information
     def get_terms(self):
         content = self.__course_info.find_all('h2', {'class': 'noPadding'})
         terms = []
