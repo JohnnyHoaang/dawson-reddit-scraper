@@ -47,92 +47,66 @@ class RedditDataSaver:
         if not os.path.isdir(os.path.dirname(self.file_path)):
             os.makedirs(os.path.dirname(self.file_path))
             if not os.path.isfile(self.file_path):
-                with open(self.file_path, 'w'):
-                    pass
+                self.__overwrite_data([])
+        with open(self.file_path, 'r') as file:
+            self.data = json.load(file)['data']
+
+    def __overwrite_data(self, new_data):
+        with open(self.file_path, 'w') as file:
+            json.dump({'data': new_data}, file)
+
+    # Updates the local file data given that the id's are not the same
+    def update_data(self, data):
+        self.__update_data_set(data)
+        self.__overwrite_data(self.data)
 
     def get_last_post_date(self):
-        with open(self.file_path, 'r') as file:
-            try:
-                data = json.load(file)
-            except JSONDecodeError:
-                return -1
-            return data[0]['created_utc']
+        return -1 if len(self.data) == 0 else self.data[0]['created_utc']
 
-    def __compare_data(self, data_set_1, data_set_2):
-        pass
+    # Updates the instanced data set with a new data set given that the id's are not the same
+    def __update_data_set(self, new_data):
+        for new_value in new_data:
+            if not self.__compare_data(new_value):
+                self.data.append(new_value)
+        self.data = sorted(self.data, key=lambda d: d['created_utc'], reverse=True)
 
-    def __save_to_file(self, data: list[dict]):
-        with open(self.file_path, 'w') as file:
-            json.dump(data, file)
-
-
-class RedditAPIScraper:
-    __user = "dawson_scraper"
-    __pwd = "dawsonscrapes123"
-    __CLIENT_ID = "81Lszn_qxI8t4gitDsB5hA"
-    __SECRET_KEY = "KZXLffRmt_pOnZoisA8pLzE4r3zegQ"
-    __headers = None
-    __url = 'https://oauth.reddit.com/r/dawson/search/?restrict_sr=dawson'
-    __url_comments = 'https://oauth.reddit.com/r/dawson/comments/?restrict_sr=dawson'
-
-    def __assign_headers(self):
-        import requests
-        auth = requests.auth.HTTPBasicAuth(self.__CLIENT_ID, self.__SECRET_KEY)
-        __data = {
-            'grant_type': 'password',
-            'username': self.__user,
-            'password': self.__pwd
-        }
-        self.__headers = {'User-Agent': 'MyAPI/0.0.1'}
-        res = requests.post('https://www.reddit.com/api/v1/access_token', auth=auth, data=__data,
-                            headers=self.__headers)
-        TOKEN = res.json()['access_token']
-        self.__headers['Authorization'] = f'bearer {TOKEN}'
-
-    def __request(self, query_params):
-        self.__assign_headers()
-        return requests.get(self.__url, query_params, headers=self.__headers).json()  # Response 200 but shows html
-
-    def search(self, keyword):
-        param = ""
-        for key in keyword:
-            param += key + '|'
-        return self.__request({'q': param[0:-1]})
-
-    def search_dates(self, keyword, periods):
-        param = ""
-        for key in keyword:
-            param += key + '|'
-        return self.__request({'q': param[0:-1], 'timestamp': f"{periods[0]}...{periods[1]}"})
+    # compares a new data set from the one instanced.
+    # Returns true if the new data set is already contained in the instance
+    def __compare_data(self, new_value):
+        for old_value in self.data:
+            if old_value['id'] == new_value['id']:
+                return True
+        return False
 
 
 if __name__ == '__main__':
     from scraping_test import Analyzer
+
+    r = RedditDataSaver()
+    r.update_data([{'id': 'b','created_utc': 12345678}])
+    print(r.get_last_post_date())
     # Pushshift API scraper
-    a = Analyzer()
-    s = RedditScraper()
-    data = s.search_submission(a.get_cs_keywords())
-    print(type(data[0]))
-    for b in data[0]:
-        print(b)
-    for d in data:
-
-        if d['title'] == '':
-            print('(no title)')
-        else:
-            print(f"Title: {d['title']}")
-
-        if d['selftext'] == '':
-            print('(no body)')
-        else:
-            print(f"Body: {d['selftext']}")
-
-        if d['author'] == '':
-            print('(no author)')
-        else:
-            print(f"Author: {d['author']}")
-
-        print('______________________________________')
-    # reddit api scraper
-    # ras = RedditAPIScraper()
-    # ras_data = ras.search(['computer science'])
+    # a = Analyzer()
+    # s = RedditScraper()
+    # data = s.search_submission(a.get_cs_keywords())
+    # print(type(data[0]))
+    # for b in data[0]:
+    #     print(b)
+    # for d in data:
+    #
+    #     if d['title'] == '':
+    #         print('(no title)')
+    #     else:
+    #         print(f"Title: {d['title']}")
+    #
+    #     if d['selftext'] == '':
+    #         print('(no body)')
+    #     else:
+    #         print(f"Body: {d['selftext']}")
+    #
+    #     if d['author'] == '':
+    #         print('(no author)')
+    #     else:
+    #         print(f"Author: {d['author']}")
+    #
+    #     print('______________________________________')
