@@ -17,7 +17,7 @@ class OracleDB:
         self.conn.autocommit = True
 
     # Populates a table with a list of values
-    def populate_table(self, table_name: str, values: tuple):
+    def populate_table(self, table_name, values):
         insert_statement = f'insert into {table_name} values ('
         for value in range(len(values)):
             insert_statement += f':{value + 1}'
@@ -28,7 +28,7 @@ class OracleDB:
             cur.execute(insert_statement, values)
 
     # reads from the db using a query and returns a list of the rows returned
-    def select(self, query: str) -> list[dict]:
+    def select(self, query):
         with self.conn.cursor() as cur:
             cur.execute(query)
             rows = cur.fetchall()
@@ -42,7 +42,7 @@ class OracleDB:
         return data
 
     # Executes and arbitrary string of sql code
-    def execute_statement(self, query: str, silent=False) -> None:
+    def execute_statement(self, query, silent=False):
         try:
             with self.conn.cursor() as cur:
                 cur.execute(query)
@@ -51,14 +51,14 @@ class OracleDB:
                 raise e
 
     # Deletes a table from the Database forcefully
-    def force_table_drop(self, table_name: str):
+    def force_table_drop(self, table_name):
         drop_query = f'drop table {table_name} cascade constraints'
         try:
             self.execute_statement(drop_query)
         except DatabaseError:
             pass
 
-    def drop_table(self, table_name: str):
+    def drop_table(self, table_name):
         del_query = f"drop table {table_name}"
         self.execute_statement(del_query)
 
@@ -79,18 +79,18 @@ class CourseScrapingDatabase:
     def __init__(self):
         self.__database = OracleDB()
 
-    def setup_database(self, setup_file: str):
+    def setup_database(self, setup_file):
         file_reader = SQLFileReader(setup_file)
         for statement in file_reader.read_statements():
             self.__database.execute_statement(statement, True)
 
-    def populate_terms(self, data: list[int]):
+    def populate_terms(self, data):
         for term_number in data:
 
             self.__database.populate_table('terms', (term_number,))
 
     # Populates the courses tables with a list of dictionaries containing the course data
-    def populate_courses(self, data: list[dict]):
+    def populate_courses(self, data):
         for course in data:
             values = (course['course_number'],
                       course['course_name'],
@@ -109,7 +109,7 @@ class CourseScrapingDatabase:
         using (term_number)''')
 
     # populates the course_terms tables with a list of dictionaries containing the
-    def populate_course_terms(self, data: list[dict]):
+    def populate_course_terms(self, data):
         for course in data:
             values = (course['term_number'], course['course_number'])
             self.__database.populate_table('courses_terms', values)
