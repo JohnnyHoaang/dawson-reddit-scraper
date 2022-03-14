@@ -57,6 +57,7 @@ class OracleDB:
             self.execute_statement(drop_query)
         except DatabaseError:
             pass
+
     # Deletes a table from the Database
     def drop_table(self, table_name):
         del_query = f"drop table {table_name}"
@@ -76,8 +77,10 @@ class OracleDB:
 
 
 class CourseScrapingDatabase:
+
     def __init__(self, user, pwd):
         self.__database = OracleDB(user, pwd)
+
     # Creates the database table using the setup file
     def setup_database(self, setup_file):
         file_reader = SQLFileReader(setup_file)
@@ -87,7 +90,6 @@ class CourseScrapingDatabase:
     # Populates the terms tables with a list of dictionaries containing the term data
     def populate_terms(self, data):
         for term_number in data:
-
             self.__database.populate_table('terms', (term_number,))
 
     # Populates the courses tables with a list of dictionaries containing the course data
@@ -101,6 +103,7 @@ class CourseScrapingDatabase:
                       course['homework_hours'],
                       course['total_hours'])
             self.__database.populate_table('courses', values)
+
     # Returns a list of all course information
     def get_all_course_info(self):
         return self.__database.select('''select * from courses

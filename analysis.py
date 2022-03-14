@@ -1,3 +1,4 @@
+import analysis
 from reddit_scraper import RedditScraper
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
@@ -8,7 +9,8 @@ from databases import CourseScrapingDatabase
 
 class Analyzer:
     # Returns keywords about computer science
-    def get_cs_keywords(self):
+    @staticmethod
+    def get_cs_keywords():
         with CourseScrapingDatabase() as database:
             course_info = database.get_all_course_info()
         # I love python
@@ -77,7 +79,8 @@ class Analyzer:
                                    f'./graphs/least_popular_{data_type}_text_keywords.png')
 
     # Returns the average length of posts or comments
-    def get_average_length_data(self, data, data_type):
+    @staticmethod
+    def get_average_length_data(data, data_type):
         length_data = 0
         count_data = 0
         average_length = 0
@@ -94,7 +97,8 @@ class Analyzer:
         return average_length
 
     # Returns the number of sentences of a post or comment
-    def __get_number_of_sentences(self, data, data_type):
+    @staticmethod
+    def __get_number_of_sentences(data, data_type):
         text = ''
         count = 0
         count_sentence = 0
@@ -151,8 +155,10 @@ class Analyzer:
                   "jul-sep": [1625097600, 1632960000], "oct-dec": [1633046400, 1640908800]}
         return months
 
+
+    @staticmethod
     # Returns posts according to months
-    def __get_all_posts_from_dates(self, keywords, months):
+    def __get_all_posts_from_dates(keywords, months):
         rs = RedditScraper()
         values = [len(rs.search_dates(keywords, months["jan-mar"])), len(rs.search_dates(keywords, months["apr-jun"])),
                   len(rs.search_dates(keywords, months["jul-sep"])),
@@ -164,7 +170,7 @@ class Analyzer:
         import matplotlib.pyplot as plt
         all_months = self.__get_epoch_values()
         names = ["january-march", "april-june", "july-september", "october-december"]
-        values = self.__get_all_posts_from_dates(keywords, all_months)
+        values = analysis.Analyzer.__get_all_posts_from_dates(keywords, all_months)
         plt.title("Frequency of posts by months in 2021")
         plt.bar(names, values)
         plt.savefig('./graphs/frequency_of_dates_plot.png')
