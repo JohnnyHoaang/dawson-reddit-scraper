@@ -1,6 +1,5 @@
 import cx_Oracle
 from cx_Oracle import DatabaseError
-from db_config import Config
 from file_reader import SQLFileReader
 from course_list_scraper import CourseScrapper
 

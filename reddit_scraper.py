@@ -102,35 +102,3 @@ class RedditDataSaver:
             if old_value['id'] == new_value['id']:
                 return True
         return False
-
-
-if __name__ == '__main__':
-    r = RedditScraper()
-    d = RedditDataSaver()
-    d.update_data([{'id': 'abc', 'created_utc': 1234, 'selftext': 'hey', 'title': 'hello'}])
-    print(r.search_submission('hey'))
-    # Pushshift API scraper
-    # a = Analyzer()
-    # s = RedditScraper()
-    # data = s.search_submission(a.get_cs_keywords())
-    # print(type(data[0]))
-    # for b in data[0]:
-    #     print(b)
-    # for d in data:
-    #
-    #     if d['title'] == '':
-    #         print('(no title)')
-    #     else:
-    #         print(f"Title: {d['title']}")
-    #
-    #     if d['selftext'] == '':
-    #         print('(no body)')
-    #     else:
-    #         print(f"Body: {d['selftext']}")
-    #
-    #     if d['author'] == '':
-    #         print('(no author)')
-    #     else:
-    #         print(f"Author: {d['author']}")
-    #
-    #     print('______________________________________')
