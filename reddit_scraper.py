@@ -2,27 +2,38 @@ import requests
 from course_list_scraper import InvalidCodeException
 import json
 import os
-from json.decoder import JSONDecodeError
+from requests.exceptions import ConnectionError
+import re
 
 
 class RedditScraper:
     __url = "https://api.pushshift.io/reddit/search/submission/?subreddit=Dawson"
     __url_comment = "https://api.pushshift.io/reddit/search/comment/?subreddit=Dawson"
 
+    def __init__(self):
+        self.__local_data = RedditDataSaver()
+
     @staticmethod
     # Returns json data from page
     def __request(url, query_params):
-        page = requests.get(url, query_params)
+        try:
+            page = requests.get(url, query_params)
+        except ConnectionError:
+            return -1
         if page.status_code != 200:
             raise InvalidCodeException("The page status is not 200")
         return json.loads(page.content)['data']
 
     # Returns json data of submissions
-    def search_submission(self, keyword):
+    def search_submission(self, keywords):
         param = ""
-        for key in keyword:
+        for key in keywords:
             param += key + '|'
-        return self.__request(self.__url, {'q': param[0:-1], 'size': 100})
+        data = self.__request(self.__url, {'q': param[0:-1], 'size': 100})
+        if data == -1:
+            return self.__local_data.search(keywords)
+        self.__local_data.update_data(data)
+        return data
 
     # Returns json data of comments
     def search_comments(self, keyword):
@@ -55,6 +66,20 @@ class RedditDataSaver:
         with open(self.file_path, 'w') as file:
             json.dump({'data': new_data}, file)
 
+    def search(self, keywords):
+        findings = []
+        for data in self.data:
+            if self.__data_has_keyword(data, keywords):
+                findings.append(data)
+        return findings
+
+    @staticmethod
+    def __data_has_keyword(data, keywords):
+        for keyword in keywords:
+            if re.search(keyword, data['title']) or re.search(keyword, data['selftext']):
+                return True
+        return False
+
     # Updates the local file data given that the id's are not the same
     def update_data(self, data):
         self.__update_data_set(data)
@@ -80,11 +105,10 @@ class RedditDataSaver:
 
 
 if __name__ == '__main__':
-    from scraping_test import Analyzer
-
-    r = RedditDataSaver()
-    r.update_data([{'id': 'b','created_utc': 12345678}])
-    print(r.get_last_post_date())
+    r = RedditScraper()
+    d = RedditDataSaver()
+    d.update_data([{'id': 'abc', 'created_utc': 1234, 'selftext': 'hey', 'title': 'hello'}])
+    print(r.search_submission('hey'))
     # Pushshift API scraper
     # a = Analyzer()
     # s = RedditScraper()

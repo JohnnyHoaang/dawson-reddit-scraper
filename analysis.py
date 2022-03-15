@@ -13,8 +13,6 @@ class Analyzer:
     def get_cs_keywords():
         with CourseScrapingDatabase() as database:
             course_info = database.get_all_course_info()
-        # I love python
-        # keywords = [(info['course_name'], ' '.join(info['course_name'].split(' ')[0:-1]))[info['course_name'].split(' ')[-1][-1] == 'I' or info['course_name'].split(' ')[-1][-1] == 'V'] for info in course_info]
         keywords = []
         for info in course_info:
             name = info['course_name']
