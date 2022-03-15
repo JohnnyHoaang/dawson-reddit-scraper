@@ -63,7 +63,7 @@ class RedditDataSaver:
     def get_last_post_date(self):
         return -1 if len(self.data) == 0 else self.data[0]['created_utc']
 
-    # Updates the instanced data set with a new data set given that the id's are not the same
+     # Updates the instanced data set with a new data set given that the id's are not the same
     def __update_data_set(self, new_data):
         for new_value in new_data:
             if not self.__compare_data(new_value):
